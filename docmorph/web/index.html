@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DocMorph</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>DocMorph</h1>
+      <p class="subtitle">Convertisseur de documents 100 % local</p>
+    </header>
+
+    <label id="dropzone" class="dropzone" for="file-input">
+      <input id="file-input" type="file" multiple hidden>
+      <strong>Déposez vos fichiers ici</strong>
+      <span>ou cliquez pour les choisir — PDF, Word, Excel, PowerPoint, ODF, TXT, RTF, JPG, PNG</span>
+    </label>
+
+    <section id="controls" class="controls" hidden>
+      <label>Convertir en
+        <select id="target"></select>
+      </label>
+      <label id="mode-field" hidden>Mode PDF vers Word
+        <select id="mode">
+          <option value="layout">Fidèle à la mise en page</option>
+          <option value="structure">Structure modifiable (équations Word)</option>
+        </select>
+      </label>
+      <button id="convert" type="button">Convertir</button>
+      <button id="clear" type="button" class="secondary">Effacer</button>
+    </section>
+    <p id="mode-hint" class="hint" hidden></p>
+
+    <table id="files" hidden>
+      <thead><tr><th>Fichier</th><th>Format détecté</th><th>Statut</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+
+    <p id="zip-row" hidden><a id="zip-link" class="button" href="#">Tout télécharger (ZIP)</a></p>
+
+    <footer id="engines"></footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
