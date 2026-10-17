@@ -26,7 +26,8 @@ dans [docs/LIMITATIONS.md](docs/LIMITATIONS.md).
 Depuis un terminal Ubuntu :
 
 ```bash
-cd "/mnt/d/My-App/DocMorph - Universal Document Converter"
+git clone https://github.com/Jalal-Zerroudi/DocMorph.git
+cd DocMorph
 bash scripts/install_wsl.sh
 ```
 
