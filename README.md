@@ -98,6 +98,17 @@ En cas d'échec, `error.code` vaut `unsupported_format`, `conversion_not_availab
 `conversion_failed`, `file_too_large` ou `timeout`, et `error.message` explique le problème en
 français.
 
+### Cycle de vie des tâches et téléchargement
+
+`POST /api/convert` renvoie un `batch_id` et les identifiants `jobs[].id` ; il n'attend pas la fin de toutes les conversions. Consultez `/api/jobs/{id}` ou `/api/batches/{id}` jusqu'à ce que chaque tâche soit `done` ou `failed`.
+
+- Le téléchargement individuel n'est disponible qu'au statut `done` ; avant cela, la route renvoie HTTP 404.
+- Le ZIP contient uniquement les tâches déjà `done` au moment de sa création. Attendez la fin du lot avant de le demander pour ne pas récupérer une archive partielle.
+- Une tâche `failed` reste consultable avec son objet `error`, mais n'est pas incluse dans le ZIP.
+- Les statuts sont conservés en mémoire : les identifiants ne sont pas persistants après un redémarrage.
+
+Téléchargez et sauvegardez les résultats utiles avant leur expiration ; DocMorph ne constitue pas un stockage permanent.
+
 ## Configuration
 
 | Variable | Défaut | Rôle |
@@ -110,7 +121,7 @@ français.
 | `DOCMORPH_WORKERS` | `3` | Conversions simultanées (une seule utilise le GPU) |
 | `DOCMORPH_PORT` | `8000` | Port d'écoute |
 
-Les fichiers sont supprimés 24 h après la conversion, ainsi qu'à chaque redémarrage du serveur.
+Le nettoyage automatique s'exécute toutes les 15 minutes. Il supprime les tâches terminées (`done` ou `failed`) dont la date de création dépasse `DOCMORPH_TTL_HOURS` (24 h par défaut), ainsi que leurs fichiers. Le délai est donc compté depuis la création de la tâche, pas depuis la fin de la conversion. Les lots devenus vides et leurs archives sont également supprimés. Au démarrage, le stockage temporaire est réinitialisé.
 
 ## Architecture
 
