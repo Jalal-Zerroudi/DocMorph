@@ -119,7 +119,20 @@ Téléchargez et sauvegardez les résultats utiles avant leur expiration ; DocMo
 | `DOCMORPH_OCR_LANGS` | `fra+eng+ara` | Langues Tesseract |
 | `DOCMORPH_DEVICE` | `auto` | `cuda` ou `cpu` pour forcer le périphérique de Docling |
 | `DOCMORPH_WORKERS` | `3` | Conversions simultanées (une seule utilise le GPU) |
-| `DOCMORPH_PORT` | `8000` | Port d'écoute |
+| `DOCMORPH_HOST` | `127.0.0.1` | Adresse d'écoute utilisée par `scripts/run.sh` |
+| `DOCMORPH_PORT` | `8000` | Port d'écoute utilisé par `scripts/run.sh` |
+| `DOCMORPH_VENV` | `~/.venvs/docmorph` | Environnement Python créé puis utilisé par les scripts |
+| `DOCMORPH_PYTHON` | `3.12` | Version Python choisie uniquement pendant l'installation |
+| `DOCLING_ARTIFACTS_PATH` | `~/.cache/docling/models` s'il existe | Répertoire des modèles Docling utilisés hors ligne |
+
+Les variables doivent précéder la commande concernée, par exemple
+`DOCMORPH_PORT=8080 bash scripts/run.sh`. Changer `DOCMORPH_PYTHON` après l'installation
+ne recrée pas l'environnement existant : choisissez au besoin un nouveau `DOCMORPH_VENV`,
+puis relancez `scripts/install_wsl.sh`.
+
+Conservez `DOCMORPH_HOST=127.0.0.1` pour un usage local. La valeur `0.0.0.0` rend
+l'interface et l'API, qui ne disposent pas d'authentification, accessibles depuis le réseau ;
+ne l'utilisez que derrière un pare-feu et sur un réseau de confiance.
 
 Le nettoyage automatique s'exécute toutes les 15 minutes. Il supprime les tâches terminées (`done` ou `failed`) dont la date de création dépasse `DOCMORPH_TTL_HOURS` (24 h par défaut), ainsi que leurs fichiers. Le délai est donc compté depuis la création de la tâche, pas depuis la fin de la conversion. Les lots devenus vides et leurs archives sont également supprimés. Au démarrage, le stockage temporaire est réinitialisé.
 
