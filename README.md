@@ -136,6 +136,38 @@ ne l'utilisez que derrière un pare-feu et sur un réseau de confiance.
 
 Le nettoyage automatique s'exécute toutes les 15 minutes. Il supprime les tâches terminées (`done` ou `failed`) dont la date de création dépasse `DOCMORPH_TTL_HOURS` (24 h par défaut), ainsi que leurs fichiers. Le délai est donc compté depuis la création de la tâche, pas depuis la fin de la conversion. Les lots devenus vides et leurs archives sont également supprimés. Au démarrage, le stockage temporaire est réinitialisé.
 
+## Diagnostic rapide
+
+Après l'installation, activez l'environnement et exécutez le diagnostic intégré :
+
+```bash
+source "${DOCMORPH_VENV:-$HOME/.venvs/docmorph}/bin/activate"
+python -m docmorph.doctor
+```
+
+La commande indique, pour chaque moteur, s'il est disponible et pourquoi il ne l'est pas. Elle
+affiche aussi le périphérique choisi pour Docling, le dossier temporaire, l'emplacement des
+modèles, les langues OCR et la matrice des conversions réellement utilisables.
+
+Une fois le serveur lancé dans un autre terminal, vérifiez l'API sans envoyer de document :
+
+```bash
+curl --fail --silent http://127.0.0.1:8000/api/formats | python -m json.tool
+```
+
+Adaptez l'adresse si vous avez changé `DOCMORPH_HOST` ou `DOCMORPH_PORT`. Le champ
+`unavailable` explique les moteurs absents, `structure_device` indique `cuda` ou `cpu`
+lorsque le mode structure est disponible, et `max_upload_mb` confirme la limite active.
+
+| Symptôme | Vérification |
+|---|---|
+| Environnement Python introuvable | Relancez `bash scripts/install_wsl.sh` ou vérifiez `DOCMORPH_VENV`. |
+| LibreOffice indisponible | Exécutez `command -v soffice`, puis consultez la raison donnée par le diagnostic. |
+| OCR incomplet | Exécutez `tesseract --list-langs` et vérifiez la présence des langues configurées dans `DOCMORPH_OCR_LANGS`. |
+| Mode structure indisponible | Vérifiez `DOCLING_ARTIFACTS_PATH` et relancez l'installation sans `--no-structure` si Docling n'est pas installé. |
+| API inaccessible | Gardez `scripts/run.sh` ouvert, lisez ses journaux et confirmez l'adresse et le port utilisés. |
+| Erreur d'écriture | Vérifiez que le chemin `DOCMORPH_DATA` existe sur le système Linux de WSL et est accessible en écriture. |
+
 ## Architecture
 
 ```
