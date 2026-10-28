@@ -147,7 +147,8 @@ python -m docmorph.doctor
 
 La commande indique, pour chaque moteur, s'il est disponible et pourquoi il ne l'est pas. Elle
 affiche aussi le périphérique choisi pour Docling, le dossier temporaire, l'emplacement des
-modèles, les langues OCR et la matrice des conversions réellement utilisables.
+modèles, les langues OCR, la taille maximale par fichier, la durée de rétention, le nombre de
+workers et la matrice des conversions réellement utilisables.
 
 Une fois le serveur lancé dans un autre terminal, vérifiez l'API sans envoyer de document :
 

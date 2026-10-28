@@ -21,6 +21,9 @@ def main() -> None:
     print(f"\nDossier temporaire : {settings.data_dir}")
     print(f"Modèles Docling    : {settings.docling_artifacts or 'cache Hugging Face (téléchargement à la demande)'}")
     print(f"Langues OCR        : {'+'.join(settings.ocr_langs)}")
+    print(f"Taille max/fichier : {settings.max_upload_mb} Mo")
+    print(f"Rétention résultats: {settings.ttl_hours:g} h")
+    print(f"Workers simultanés : {settings.workers}")
 
     print("\nConversions disponibles :")
     for row in registry.matrix():
