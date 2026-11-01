@@ -98,6 +98,10 @@ En cas d'échec, `error.code` vaut `unsupported_format`, `conversion_not_availab
 `conversion_failed`, `file_too_large` ou `timeout`, et `error.message` explique le problème en
 français.
 
+Les noms des fichiers téléchargés et des entrées ZIP sont dérivés uniquement du nom de base :
+les chemins envoyés par certains clients (y compris `C:\\fakepath\\…`) et les caractères de
+contrôle ne sont jamais repris dans le résultat.
+
 ### Cycle de vie des tâches et téléchargement
 
 `POST /api/convert` renvoie un `batch_id` et les identifiants `jobs[].id` ; il n'attend pas la fin de toutes les conversions. Consultez `/api/jobs/{id}` ou `/api/batches/{id}` jusqu'à ce que chaque tâche soit `done` ou `failed`.

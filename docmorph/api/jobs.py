@@ -38,7 +38,7 @@ class Job:
 
     @property
     def output_name(self) -> str:
-        return f"{Path(self.filename).stem or 'document'}{self.target.extension}"
+        return _safe_output_name(self.filename, self.target.extension)
 
     def fail(self, error: DocMorphError) -> None:
         self.status = JobStatus.FAILED
@@ -184,6 +184,13 @@ class JobManager:
         for batch_id in empty:
             self.storage.remove_batch(batch_id)
         return len(expired)
+
+
+def _safe_output_name(filename: str, extension: str) -> str:
+    # Browsers and API clients may submit POSIX paths or Windows fake paths.
+    basename = filename.replace("\\", "/").rsplit("/", 1)[-1]
+    stem = "".join(char for char in Path(basename).stem if char.isprintable()).strip(" .")
+    return f"{stem or 'document'}{extension}"
 
 
 def _unique_name(name: str, used: set[str]) -> str:

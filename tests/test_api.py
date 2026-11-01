@@ -9,8 +9,10 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
+from docmorph.api.jobs import Job
 from docmorph.api.main import create_app
 from docmorph.config import settings
+from docmorph.core.models import Format, Mode
 from docmorph.engines.images import ImageToPdfEngine
 from docmorph.engines.pdf_text import PdfTextEngine
 
@@ -30,6 +32,27 @@ def _wait(client: TestClient, batch_id: str) -> list[dict]:
             return jobs
         time.sleep(0.05)
     raise AssertionError("batch did not finish")
+
+
+@pytest.mark.parametrize(
+    ("filename", "expected"),
+    [
+        ("report.docx", "report.pdf"),
+        ("../../report.docx", "report.pdf"),
+        (r"C:\fakepath\report.docx", "report.pdf"),
+        ("..", "document.pdf"),
+        ("\n", "document.pdf"),
+    ],
+)
+def test_output_name_uses_safe_basename(filename: str, expected: str) -> None:
+    job = Job(
+        id="job",
+        batch_id="batch",
+        filename=filename,
+        target=Format.PDF,
+        requested_mode=Mode.AUTO,
+    )
+    assert job.output_name == expected
 
 
 def test_formats_only_lists_installed_engines(client: TestClient) -> None:
