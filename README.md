@@ -138,6 +138,26 @@ Conservez `DOCMORPH_HOST=127.0.0.1` pour un usage local. La valeur `0.0.0.0` ren
 l'interface et l'API, qui ne disposent pas d'authentification, accessibles depuis le réseau ;
 ne l'utilisez que derrière un pare-feu et sur un réseau de confiance.
 
+## Sécurité des documents importés
+
+DocMorph traite le contenu fourni avec plusieurs bibliothèques et exécutables natifs
+(LibreOffice, PyMuPDF, Tesseract, Ghostscript, Pandoc et, selon le mode, Docling). La détection
+du format réel et la limite de taille réduisent les erreurs de traitement, mais ne constituent
+ni une analyse antimalware ni une isolation de sécurité.
+
+Pour des documents provenant d'une source non fiable :
+
+- conservez l'écoute sur `127.0.0.1` et n'exposez pas directement l'API sur un réseau ;
+- exécutez DocMorph avec un compte non privilégié, sans secrets accessibles dans son
+  environnement ;
+- utilisez de préférence une distribution WSL ou une machine virtuelle dédiée et jetable ;
+- maintenez les dépendances Python et les outils système à jour ;
+- récupérez le résultat nécessaire, puis laissez expirer ou supprimez les fichiers temporaires.
+
+Ne traitez pas un document sensible sur une instance partagée : l'API n'a ni authentification,
+ni séparation entre utilisateurs, et toute personne pouvant l'atteindre peut soumettre des
+fichiers et consulter les identifiants de tâches qu'elle connaît.
+
 Le nettoyage automatique s'exécute toutes les 15 minutes. Il supprime les tâches terminées (`done` ou `failed`) dont la date de création dépasse `DOCMORPH_TTL_HOURS` (24 h par défaut), ainsi que leurs fichiers. Le délai est donc compté depuis la création de la tâche, pas depuis la fin de la conversion. Les lots devenus vides et leurs archives sont également supprimés. Au démarrage, le stockage temporaire est réinitialisé.
 
 ## Diagnostic rapide
