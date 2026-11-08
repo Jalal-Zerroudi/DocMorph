@@ -130,7 +130,10 @@ Téléchargez et sauvegardez les résultats utiles avant leur expiration ; DocMo
 | `DOCLING_ARTIFACTS_PATH` | `~/.cache/docling/models` s'il existe | Répertoire des modèles Docling utilisés hors ligne |
 
 Les variables doivent précéder la commande concernée, par exemple
-`DOCMORPH_PORT=8080 bash scripts/run.sh`. Changer `DOCMORPH_PYTHON` après l'installation
+`DOCMORPH_PORT=8080 bash scripts/run.sh`. Les valeurs de
+`DOCMORPH_MAX_UPLOAD_MB` et `DOCMORPH_WORKERS` doivent être des entiers strictement positifs ;
+`DOCMORPH_TTL_HOURS` doit être un nombre fini strictement positif. Une valeur invalide arrête
+le démarrage avec un message qui nomme la variable concernée. Changer `DOCMORPH_PYTHON` après l'installation
 ne recrée pas l'environnement existant : choisissez au besoin un nouveau `DOCMORPH_VENV`,
 puis relancez `scripts/install_wsl.sh`.
 
