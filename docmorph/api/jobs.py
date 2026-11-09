@@ -135,7 +135,7 @@ class JobManager:
             return
         except Exception as exc:
             log.exception("job %s crashed", job.id)
-            job.fail(ConversionFailed("Erreur inattendue pendant la conversion.", detail=repr(exc)))
+            job.fail(ConversionFailed("Erreur inattendue pendant la conversion."))
             return
         job.output = current
         job.mode_used = plan[0].mode

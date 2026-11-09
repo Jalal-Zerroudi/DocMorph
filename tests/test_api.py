@@ -12,9 +12,22 @@ from fastapi.testclient import TestClient
 from docmorph.api.jobs import Job
 from docmorph.api.main import create_app
 from docmorph.config import settings
-from docmorph.core.models import Format, Mode
+from docmorph.core.engine import Engine
+from docmorph.core.models import Format, Mode, Route
 from docmorph.engines.images import ImageToPdfEngine
 from docmorph.engines.pdf_text import PdfTextEngine
+
+
+class _CrashingImageEngine(Engine):
+    name = "crashing-image"
+    label = "Crashing image"
+    routes = (Route(Format.JPG, Format.PDF),)
+
+    def availability(self) -> str | None:
+        return None
+
+    def convert(self, src: Path, dst: Path, route: Route) -> None:
+        raise RuntimeError("sensitive backend detail")
 
 
 @pytest.fixture
@@ -92,6 +105,26 @@ def test_batch_conversion_download_and_zip(client: TestClient, png_with_alpha: P
 
     archive = zipfile.ZipFile(io.BytesIO(client.get(f"/api/batches/{res['batch_id']}/zip").content))
     assert sorted(archive.namelist()) == ["logo.pdf", "photo.pdf"]
+
+
+def test_unexpected_engine_error_does_not_leak_internal_detail(tmp_path: Path, jpg_file: Path) -> None:
+    config = replace(settings, data_dir=tmp_path / "data", max_upload_mb=1)
+    app = create_app(config, engines=[_CrashingImageEngine()])
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/api/convert",
+            files=[("files", ("photo.jpg", jpg_file.read_bytes()))],
+            data={"target": "pdf"},
+        ).json()
+        job = _wait(client, response["batch_id"])[0]
+
+    assert job["status"] == "failed"
+    assert job["error"] == {
+        "code": "conversion_failed",
+        "message": "Erreur inattendue pendant la conversion.",
+        "detail": None,
+    }
 
 
 def test_unsupported_file_fails_cleanly(client: TestClient) -> None:
