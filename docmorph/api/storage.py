@@ -34,14 +34,18 @@ class Storage:
 
     def save(self, stream: BinaryIO, dest: Path) -> int:
         written = 0
-        with dest.open("wb") as out:
-            while chunk := stream.read(_CHUNK):
-                written += len(chunk)
-                if written > self.max_bytes:
-                    out.close()
-                    dest.unlink(missing_ok=True)
-                    raise FileTooLarge(f"Fichier trop volumineux (maximum {self.max_bytes // (1024 * 1024)} Mo).")
-                out.write(chunk)
+        try:
+            with dest.open("wb") as out:
+                while chunk := stream.read(_CHUNK):
+                    written += len(chunk)
+                    if written > self.max_bytes:
+                        raise FileTooLarge(
+                            f"Fichier trop volumineux (maximum {self.max_bytes // (1024 * 1024)} Mo)."
+                        )
+                    out.write(chunk)
+        except Exception:
+            dest.unlink(missing_ok=True)
+            raise
         return written
 
     def remove_job(self, job_id: str) -> None:
