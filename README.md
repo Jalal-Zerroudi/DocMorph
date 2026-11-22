@@ -98,6 +98,25 @@ En cas d'échec, `error.code` vaut `unsupported_format`, `conversion_not_availab
 `conversion_failed`, `file_too_large` ou `timeout`, et `error.message` explique le problème en
 français.
 
+### Champs d'une tâche
+
+Les objets renvoyés dans `jobs` par les routes de conversion, de lot et de statut suivent le même contrat :
+
+| Champ | Signification |
+|---|---|
+| `id`, `batch_id` | Identifiants opaques de la tâche et de son lot |
+| `filename` | Nom fourni lors de l'envoi ; ne doit pas être utilisé comme chemin local |
+| `source_format`, `pdf_kind` | Format détecté et type de PDF ; `pdf_kind` vaut `null` pour les autres formats |
+| `target` | Format de sortie demandé |
+| `requested_mode` | Mode reçu par l'API, y compris `auto` |
+| `mode_used` | Mode effectivement choisi ; disponible après une conversion réussie |
+| `status` | `queued`, `running`, `done` ou `failed` |
+| `error` | Objet d'erreur uniquement au statut `failed`, sinon `null` |
+| `output_name` | Nom du résultat uniquement au statut `done`, sinon `null` |
+| `duration_s` | Durée en secondes une fois la tâche terminée, sinon `null` |
+
+Les champs liés à la détection peuvent également être `null` lorsqu'un fichier est rejeté avant que son format soit reconnu. Un client doit donc décider à partir de `status`, et non de la présence d'un nom de sortie ou d'une durée.
+
 Les noms des fichiers téléchargés et des entrées ZIP sont dérivés uniquement du nom de base :
 les chemins envoyés par certains clients (y compris `C:\\fakepath\\…`) et les caractères de
 contrôle ne sont jamais repris dans le résultat.
